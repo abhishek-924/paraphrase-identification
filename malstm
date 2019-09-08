@@ -98,4 +98,32 @@ class Manhattan_LSTM(nn.Module):
         similarity_scores = self.exponent_neg_manhattan_distance(max_pool_1, new_pool)
         
         return similarity_scores, elitehs_1, elitehs_2
-    
+      def init_weights(self):
+        for name_1, param_1 in self.lstm_1.named_parameters():
+            if 'bias' in name_1:
+                nn.init.constant_(param_1, 0.01)
+            elif 'weight' in name_1:
+                nn.init.xavier_uniform_(param_1)
+
+        lstm_1 = self.lstm_1.state_dict()
+        lstm_2 = self.lstm_2.state_dict()
+
+        for name_1, param_1 in lstm_1.items():
+            # Backwards compatibility for serialized parameters.
+            if isinstance(param_1, torch.nn.Parameter):
+                param_1 = param_1.data
+
+            lstm_2[name_1].copy_(param_1)
+
+    def init_hidden(self, batch_size):
+        # Hidden dimensionality : 2 (h_0, c_0) x Num. Layers * Num. Directions x Batch Size x Hidden Size
+        result = torch.zeros(2, 2, batch_size, self.hidden_size)
+        result = tuple(result)
+
+        if self.use_cuda: 
+            result = (result[0].cuda(), result[1].cuda())
+            return result
+        else: return result
+model = Manhattan_LSTM(hidden_size, embedding.embedding_matrix, train_embedding=False)
+if use_cuda: model = model.cuda()
+model.init_weights()
