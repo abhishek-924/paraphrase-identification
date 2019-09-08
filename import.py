@@ -47,3 +47,7 @@ import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
 import numpy as np
+import torch.nn as nn
+from torch import Tensor
+from torch import optim
+import torch.nn.functional as F
