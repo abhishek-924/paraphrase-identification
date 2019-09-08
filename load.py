@@ -28,3 +28,44 @@ embedding_size = embedding.embedding_matrix.shape[1]
 print(embedding_size)
 
 len(embedding.embedding_matrix)
+def commonWords(sen_1, sen_2):
+  d = np.empty(len(data.word2index), dtype=int)
+  for i in range(len(d)):
+    d[i] = -1
+    
+  flag = False
+    
+  listPairs = []
+  list1 = []
+  list2 = []
+  for i in range(len(sen_1)):
+    d[sen_1[i]] = i
+    
+  for i in range(len(sen_2)):
+    if d[sen_2[i]] > 1 and sen_2[i] > 0 :
+      list1.append(d[sen_2[i]])
+      list2.append(i)
+      flag = True
+      
+    
+  list1 = list(dict.fromkeys(list1))
+  list2 = list(dict.fromkeys(list2))
+  
+  listPairs.append(list1)
+  listPairs.append(list2)
+  return listPairs
+
+def max_pool(e_list):
+  e_list = np.array(e_list)
+  
+  for i in range(len(e_list)):
+    e_list[i] = e_list[i].data.cpu().numpy()
+  mp = []
+  for i in range(100):
+    m = e_list[0][i]
+    for j in range(len(e_list)):
+      m = max(m, e_list[j][i])
+    mp.append(m)
+      
+  #print("Length of mp = " + str(len(mp)))
+  return torch.cuda.FloatTensor(mp)
